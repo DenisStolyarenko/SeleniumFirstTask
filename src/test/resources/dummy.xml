@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="First suite" verbose="1" parallel="false">
+    <test name="CTC">
+        <classes>
+            <class name="BaseTest"></class>
+        </classes>
+    </test>
+
+</suite>
