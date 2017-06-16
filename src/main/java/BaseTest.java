@@ -151,7 +151,7 @@ public class BaseTest {
 
     @AfterClass(description = "close browser")
     public void afterClass() {
-//        driver.quit();
+        driver.quit();
     }
 
     protected void waitForElementPresent(By locator) {
