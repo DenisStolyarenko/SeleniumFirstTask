@@ -8,6 +8,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import java.text.DateFormat;
@@ -23,14 +24,11 @@ public class BaseTest {
     private static final DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private static final DateFormat inputFormat = new SimpleDateFormat("MM/dd/yy");
     private WebDriver driver;
-    private String baseUrl;
 
     @Test(description = "Log in to CTC")
-    public void logIn(){
-        String userName = "dst";
-        String pwdName = "0";
+    @Parameters({"userName", "pwdName","baseUrl"})
+    public void logIn(String userName, String pwdName, String baseUrl){
         String textForComparing = "Logged in as";
-        baseUrl = "https://tst1.epm-ctc.projects.epam.com/";
         driver.get(baseUrl + "/login.do?logout=true&tz=GMT%2B06:00");
         driver.findElement(By.xpath("//input[@name='username']"))
                 .sendKeys(userName);
@@ -46,7 +44,8 @@ public class BaseTest {
     }
 
     @Test(dependsOnMethods = "logIn", description = "check opening the list of Bussiness Trips")
-    public void openListOfBT() {
+    @Parameters({"baseUrl"})
+    public void openListOfBT(String baseUrl) {
         driver.get(baseUrl + BUSINESS_TRIP_LOCATION);
         String result = driver.findElement(By.xpath("//td[@class='header1']/h1"))
                 .getText();
@@ -55,13 +54,10 @@ public class BaseTest {
     }
 
     @Test(dependsOnMethods = "openListOfBT", description = "create new BT")
-    public void createNewBt() throws InterruptedException {
+    @Parameters({"projectName", "country", "destinationCity", "destinationAddress"})
+    public void createNewBt(String projectName, String country, String destinationCity, String destinationAddress) throws InterruptedException {
         Date date = new Date();
         Calendar calendar = Calendar.getInstance();
-        String projectName = "ENRC-TRD";
-        String country = "Belarus";
-        String destinationCity = "Minsk";
-        String destinationAddress = "Minsk";
         String description = "Travel to " + destinationCity + " " + sdf.format(date);
         Integer estimatedBudget = new Random().nextInt(100000);
         String plannedStartDate = "06/11/17"; // исправить на текущую дату inputFormat.format(date)
@@ -70,8 +66,7 @@ public class BaseTest {
         By SAVE_LOCATOR = By.xpath("//*[@id='saveButton']/button");
         final By PLANNING_DURATION_LOCATOR = By.xpath("//span[@id='plannedDuration']");
         By ID_LINK_LOCATOR = By.xpath("//a[@onclick='animateDetailsLoading()']");
-        Actions actions = new Actions(driver);
-//
+//        Actions actions = new Actions(driver);
         driver.findElement(By.xpath("//input[@title='Create New Business Trip Request']"))
                 .click();
         driver.findElement(By.xpath("//img[contains(@onclick,'chooseprojectcostobject')]"))
@@ -125,7 +120,6 @@ public class BaseTest {
     }
     @Test(dependsOnMethods = "createNewBt", description = "Log out")
     public void logOut() throws InterruptedException {
-//        Thread.sleep(20000);
         By LOGOUT_LOCATOR = By.xpath("//a[@href='logout.do']");
         String textWelcome = "Welcome to EPAM Cost Tracking Center";
         waitForElementVisible(LOGOUT_LOCATOR);

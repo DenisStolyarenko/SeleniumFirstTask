@@ -1,6 +1,13 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="First suite" verbose="1" parallel="false">
-    <test name="CTC">
+    <test name="CTCTest">
+        <parameter name="userName" value="dst"/>
+        <parameter name="pwdName" value="0"/>
+        <parameter name="baseUrl" value="https://tst1.epm-ctc.projects.epam.com/"/>
+        <parameter name="projectName" value="ENRC-TRD"/>
+        <parameter name="country" value="Belarus"/>
+        <parameter name="destinationCity" value="Minsk"/>
+        <parameter name="destinationAddress" value="Minsk"/>
         <classes>
             <class name="BaseTest"></class>
         </classes>
