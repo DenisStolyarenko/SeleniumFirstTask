@@ -38,7 +38,6 @@ public class BaseTest {
                 .click();
         String result = driver.findElement(By.xpath("//*[@id='headerLogin']/div[@class='blInfoLogin']"))
                 .getText();
-//        System.out.println(result);
         Assert.assertTrue(result.contains(textForComparing));
 
     }
@@ -49,7 +48,6 @@ public class BaseTest {
         driver.get(baseUrl + BUSINESS_TRIP_LOCATION);
         String result = driver.findElement(By.xpath("//td[@class='header1']/h1"))
                 .getText();
-//        System.out.println(result);
         Assert.assertEquals(result, "Business Trips");
     }
 
@@ -60,13 +58,12 @@ public class BaseTest {
         Calendar calendar = Calendar.getInstance();
         String description = "Travel to " + destinationCity + " " + sdf.format(date);
         Integer estimatedBudget = new Random().nextInt(100000);
-        String plannedStartDate = "06/11/17"; // исправить на текущую дату inputFormat.format(date)
-        String plannedEndDate = "10/11/17"; // исправить на текущую дату плюс 7 дней
+        String plannedStartDate = "06/11/17";
+        String plannedEndDate = "10/11/17";
         By COLLAPSE_LOCATOR = By.xpath("//span[text()='Collapse']");
         By SAVE_LOCATOR = By.xpath("//*[@id='saveButton']/button");
         final By PLANNING_DURATION_LOCATOR = By.xpath("//span[@id='plannedDuration']");
         By ID_LINK_LOCATOR = By.xpath("//a[@onclick='animateDetailsLoading()']");
-//        Actions actions = new Actions(driver);
         driver.findElement(By.xpath("//input[@title='Create New Business Trip Request']"))
                 .click();
         driver.findElement(By.xpath("//img[contains(@onclick,'chooseprojectcostobject')]"))
@@ -104,7 +101,6 @@ public class BaseTest {
                 .sendKeys(plannedEndDate);
         driver.findElement(By.xpath("//input[@name='itemName']"))
                 .sendKeys("BT created by Selenium " + sdf.format(date));
-//        System.out.println(driver.findElement(PLANNING_DURATION_LOCATOR).getText());
         (new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
             public Boolean apply(WebDriver d){
                 String result = d.findElement(PLANNING_DURATION_LOCATOR).getText();
@@ -126,11 +122,9 @@ public class BaseTest {
         waitForElementEnabled(LOGOUT_LOCATOR);
         driver.findElement(LOGOUT_LOCATOR).click();
         Alert alert = driver.switchTo().alert();
-//        System.out.println(alert.getText());
         alert.accept();
         String result = driver.findElement(By.xpath("//td[@class='header1']/h1"))
                 .getText();
-//        System.out.println(result);
         Assert.assertEquals(result, textWelcome);
     }
 
