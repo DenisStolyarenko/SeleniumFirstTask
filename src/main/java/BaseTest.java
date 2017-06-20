@@ -128,7 +128,6 @@ public class BaseTest {
         driver = new FirefoxDriver();
         driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-//        driver.manage().window().maximize();
         driver.manage().window().setSize(new Dimension(1600, 900));
 
     }
