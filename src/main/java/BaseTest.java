@@ -1,6 +1,5 @@
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -19,10 +18,8 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class BaseTest {
-    private static final int WAIT_FOR_ELEMENT_TIMEOUT_SECONDS = 20;
     private final String BUSINESS_TRIP_LOCATION = "/businesstrip/list.do";
     private static final DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    private static final DateFormat inputFormat = new SimpleDateFormat("MM/dd/yy");
     private WebDriver driver;
 
     @Test(description = "Log in to CTC")
@@ -38,32 +35,31 @@ public class BaseTest {
                 .click();
         String result = driver.findElement(By.xpath("//*[@id='headerLogin']/div[@class='blInfoLogin']"))
                 .getText();
-        Assert.assertTrue(result.contains(textForComparing));
+        Assert.assertTrue(result.contains(textForComparing),"Impossible to login to CTC");
 
     }
 
     @Test(dependsOnMethods = "logIn", description = "check opening the list of Bussiness Trips")
     @Parameters({"baseUrl"})
     public void openListOfBT(String baseUrl) {
+        String sectionName = "Business Trips";
         driver.get(baseUrl + BUSINESS_TRIP_LOCATION);
         String result = driver.findElement(By.xpath("//td[@class='header1']/h1"))
                 .getText();
-        Assert.assertEquals(result, "Business Trips");
+        Assert.assertEquals(result, sectionName, "The section did not found");
     }
 
     @Test(dependsOnMethods = "openListOfBT", description = "create new BT")
     @Parameters({"projectName", "country", "destinationCity", "destinationAddress"})
     public void createNewBt(String projectName, String country, String destinationCity, String destinationAddress) throws InterruptedException {
         Date date = new Date();
-        Calendar calendar = Calendar.getInstance();
         String description = "Travel to " + destinationCity + " " + sdf.format(date);
         Integer estimatedBudget = new Random().nextInt(100000);
         String plannedStartDate = "06/11/17";
         String plannedEndDate = "10/11/17";
-        By COLLAPSE_LOCATOR = By.xpath("//span[text()='Collapse']");
         By SAVE_LOCATOR = By.xpath("//*[@id='saveButton']/button");
         final By PLANNING_DURATION_LOCATOR = By.xpath("//span[@id='plannedDuration']");
-        By ID_LINK_LOCATOR = By.xpath("//a[@onclick='animateDetailsLoading()']");
+        By ID_LINK_LOCATOR = By.xpath("//span//a[@onclick='animateDetailsLoading()']");
         driver.findElement(By.xpath("//input[@title='Create New Business Trip Request']"))
                 .click();
         driver.findElement(By.xpath("//img[contains(@onclick,'chooseprojectcostobject')]"))
@@ -109,8 +105,7 @@ public class BaseTest {
         });
         String executeString = driver.findElement(SAVE_LOCATOR).getAttribute("onclick");
         ((JavascriptExecutor)driver).executeScript(executeString);
-
-        Assert.assertTrue(driver.findElement(ID_LINK_LOCATOR).isDisplayed());
+        Assert.assertTrue(checkIDLink(ID_LINK_LOCATOR), "Business Trip is not created");
 
 
     }
@@ -125,7 +120,7 @@ public class BaseTest {
         alert.accept();
         String result = driver.findElement(By.xpath("//td[@class='header1']/h1"))
                 .getText();
-        Assert.assertEquals(result, textWelcome);
+        Assert.assertEquals(result, textWelcome, "Logout is not performed");
     }
 
     @BeforeClass (description = "Start browser")
@@ -133,6 +128,7 @@ public class BaseTest {
         driver = new FirefoxDriver();
         driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+//        driver.manage().window().maximize();
         driver.manage().window().setSize(new Dimension(1600, 900));
 
     }
@@ -154,4 +150,10 @@ public class BaseTest {
         new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(locator));
     }
 
+    protected boolean checkIDLink (By locator){
+        String result = driver.findElement(locator).getText();
+        if (result.length() == 19){
+            return true;
+        } else return false;
+    }
 }
