@@ -133,7 +133,7 @@ public class BaseTest {
     }
 
     @AfterClass(description = "close browser")
-    public void afterClass() {
+    public void closeBrowser() {
         driver.quit();
     }
 
