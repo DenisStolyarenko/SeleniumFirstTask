@@ -20,12 +20,17 @@ import java.util.concurrent.TimeUnit;
 public class BaseTest {
     private final String BUSINESS_TRIP_LOCATION = "/businesstrip/list.do";
     private static final DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private static final String projectName = "ENRC-TRD";
+    private static final String country = "Belarus";
+    private static final String destinationCity = "Minsk";
+    private static final String destinationAddress = "Minsk";
     private WebDriver driver;
 
     @Test(description = "Log in to CTC")
     @Parameters({"userName", "pwdName","baseUrl"})
     public void logIn(String userName, String pwdName, String baseUrl){
-        String textForComparing = "Logged in as";
+        String firstName = "Denis";
+        String textForComparing = "Logged in as " + firstName;
         driver.get(baseUrl + "/login.do?logout=true&tz=GMT%2B06:00");
         driver.findElement(By.xpath("//input[@name='username']"))
                 .sendKeys(userName);
@@ -33,7 +38,7 @@ public class BaseTest {
                 .sendKeys(pwdName);
         driver.findElement(By.xpath("//input[@name='Login']"))
                 .click();
-        String result = driver.findElement(By.xpath("//*[@id='headerLogin']/div[@class='blInfoLogin']"))
+        String result = driver.findElement(By.xpath("//td[@id='headerLogin']/div[@class='blInfoLogin']"))
                 .getText();
         Assert.assertTrue(result.contains(textForComparing),"Impossible to login to CTC");
 
@@ -50,16 +55,18 @@ public class BaseTest {
     }
 
     @Test(dependsOnMethods = "openListOfBT", description = "create new BT")
-    @Parameters({"projectName", "country", "destinationCity", "destinationAddress"})
-    public void createNewBt(String projectName, String country, String destinationCity, String destinationAddress) throws InterruptedException {
+    public void createNewBt() throws InterruptedException {
         Date date = new Date();
         String description = "Travel to " + destinationCity + " " + sdf.format(date);
         Integer estimatedBudget = new Random().nextInt(100000);
         String plannedStartDate = "06/11/17";
         String plannedEndDate = "10/11/17";
-        By SAVE_LOCATOR = By.xpath("//*[@id='saveButton']/button");
+        By SAVE_LOCATOR = By.xpath("//div[@id='saveButton']/button");
+        By saveButton = By.xpath("//button[text()[contains(.,'Save Changes')]]");
+
         final By PLANNING_DURATION_LOCATOR = By.xpath("//span[@id='plannedDuration']");
         By ID_LINK_LOCATOR = By.xpath("//span//a[@onclick='animateDetailsLoading()']");
+
         driver.findElement(By.xpath("//input[@title='Create New Business Trip Request']"))
                 .click();
         driver.findElement(By.xpath("//img[contains(@onclick,'chooseprojectcostobject')]"))
@@ -83,11 +90,11 @@ public class BaseTest {
                 .sendKeys(destinationAddress);
         driver.findElement(By.xpath("//textarea[@id='description']"))
                 .sendKeys(description);
-        if ( !driver.findElement(By.xpath("//*[@id='ticketsRequired']")).isSelected() ){
-            driver.findElement(By.xpath("//*[@id='ticketsRequired']")).click();
+        if ( !driver.findElement(By.xpath("//input[@id='ticketsRequired']")).isSelected() ){
+            driver.findElement(By.xpath("//input[@id='ticketsRequired']")).click();
         }
-        if ( !driver.findElement(By.xpath("//*[@id='carRequired']")).isSelected() ){
-            driver.findElement(By.xpath("//*[@id='carRequired']")).click();
+        if ( !driver.findElement(By.xpath("//input[@id='carRequired']")).isSelected() ){
+            driver.findElement(By.xpath("//input[@id='carRequired']")).click();
         }
         driver.findElement(By.xpath("//input[@class='textfield textfieldDigit textfieldAmount' and @name='estimatedBudget']"))
                 .sendKeys(estimatedBudget.toString());
@@ -97,7 +104,7 @@ public class BaseTest {
                 .sendKeys(plannedEndDate);
         driver.findElement(By.xpath("//input[@name='itemName']"))
                 .sendKeys("BT created by Selenium " + sdf.format(date));
-        (new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
+        (new WebDriverWait(driver, 20)).until(new ExpectedCondition<Boolean>() {
             public Boolean apply(WebDriver d){
                 String result = d.findElement(PLANNING_DURATION_LOCATOR).getText();
                 return (!result.toLowerCase().equals("0"));
@@ -105,7 +112,8 @@ public class BaseTest {
         });
         String executeString = driver.findElement(SAVE_LOCATOR).getAttribute("onclick");
         ((JavascriptExecutor)driver).executeScript(executeString);
-        Assert.assertTrue(checkIDLink(ID_LINK_LOCATOR), "Business Trip is not created");
+        String btId = driver.findElement(By.xpath("//span[@class='item' and contains(text(), 'Business Trip ID: #')]/a")).getText();
+        Assert.assertEquals(btId.length(), 19, "Business Trip is not created");
 
 
     }

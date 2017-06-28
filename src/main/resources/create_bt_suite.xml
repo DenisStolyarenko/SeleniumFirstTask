@@ -4,10 +4,6 @@
         <parameter name="userName" value="dst"/>
         <parameter name="pwdName" value="0"/>
         <parameter name="baseUrl" value="https://tst1.epm-ctc.projects.epam.com/"/>
-        <parameter name="projectName" value="ENRC-TRD"/>
-        <parameter name="country" value="Belarus"/>
-        <parameter name="destinationCity" value="Minsk"/>
-        <parameter name="destinationAddress" value="Minsk"/>
         <classes>
             <class name="BaseTest"></class>
         </classes>
