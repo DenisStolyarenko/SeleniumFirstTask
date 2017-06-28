@@ -61,56 +61,39 @@ public class BaseTest {
         Integer estimatedBudget = new Random().nextInt(100000);
         String plannedStartDate = "06/11/17";
         String plannedEndDate = "10/11/17";
-        By SAVE_LOCATOR = By.xpath("//div[@id='saveButton']/button");
         By saveButton = By.xpath("//button[text()[contains(.,'Save Changes')]]");
 
-        final By PLANNING_DURATION_LOCATOR = By.xpath("//span[@id='plannedDuration']");
-        By ID_LINK_LOCATOR = By.xpath("//span//a[@onclick='animateDetailsLoading()']");
-
-        driver.findElement(By.xpath("//input[@title='Create New Business Trip Request']"))
-                .click();
-        driver.findElement(By.xpath("//img[contains(@onclick,'chooseprojectcostobject')]"))
-                .click();
+        driver.findElement(By.xpath("//input[@title='Create New Business Trip Request']")).click();
+        driver.findElement(By.xpath("//img[contains(@onclick,'chooseprojectcostobject')]")).click();
         driver.switchTo().frame("frLookupDialog");
-        driver.findElement(By.xpath("//input[@name='keywordSearch']"))
-                .sendKeys(projectName);
-        driver.findElement(By.xpath("//input[@value='Go']"))
-                .click();
-        driver.findElement(By.xpath("//input[@type='checkbox' and @projectcostobjectname='" + projectName + "']"))
-                .click();
-        driver.findElement(By.xpath("//input[@value='OK']"))
-                .click();
+        driver.findElement(By.xpath("//input[@name='keywordSearch']")).sendKeys(projectName);
+        driver.findElement(By.xpath("//input[@value='Go']")).click();
+        driver.findElement(By.xpath("//input[@type='checkbox' and @projectcostobjectname='" + projectName + "']")).click();
+        driver.findElement(By.xpath("//input[@value='OK']")).click();
         waitForElementEnabled(By.xpath("//input[@id='plannedEndDate_ui']"));
         Select countrySelect = new Select(driver.findElement(By.xpath(".//select[@name='destinationCountryId']")));
-        countrySelect
-                .selectByVisibleText(country);
-        driver.findElement(By.xpath("//input[@name='destinationCity']"))
-                .sendKeys(destinationCity);
-        driver.findElement(By.xpath("//textarea[@name='destinationAddress']"))
-                .sendKeys(destinationAddress);
-        driver.findElement(By.xpath("//textarea[@id='description']"))
-                .sendKeys(description);
+        countrySelect.selectByVisibleText(country);
+        driver.findElement(By.xpath("//input[@name='destinationCity']")).sendKeys(destinationCity);
+        driver.findElement(By.xpath("//textarea[@name='destinationAddress']")).sendKeys(destinationAddress);
+        driver.findElement(By.xpath("//textarea[@id='description']")).sendKeys(description);
         if ( !driver.findElement(By.xpath("//input[@id='ticketsRequired']")).isSelected() ){
             driver.findElement(By.xpath("//input[@id='ticketsRequired']")).click();
         }
         if ( !driver.findElement(By.xpath("//input[@id='carRequired']")).isSelected() ){
             driver.findElement(By.xpath("//input[@id='carRequired']")).click();
         }
-        driver.findElement(By.xpath("//input[@class='textfield textfieldDigit textfieldAmount' and @name='estimatedBudget']"))
-                .sendKeys(estimatedBudget.toString());
-        driver.findElement(By.xpath("//input[@id='plannedStartDate_ui']"))
-                .sendKeys(plannedStartDate);
-        driver.findElement(By.xpath("//input[@id='plannedEndDate_ui']"))
-                .sendKeys(plannedEndDate);
-        driver.findElement(By.xpath("//input[@name='itemName']"))
-                .sendKeys("BT created by Selenium " + sdf.format(date));
+        driver.findElement(By.xpath("//input[@class='textfield textfieldDigit textfieldAmount' and @name='estimatedBudget']")).sendKeys(estimatedBudget.toString());
+        driver.findElement(By.xpath("//input[@id='plannedStartDate_ui']")).sendKeys(plannedStartDate);
+        driver.findElement(By.xpath("//input[@id='plannedEndDate_ui']")).sendKeys(plannedEndDate);
+        driver.findElement(By.xpath("//input[@name='itemName']")).sendKeys("BT created by Selenium " + sdf.format(date));
+        waitForElementEnabled(By.xpath("//input[@id='plannedStartDate_ui']"));
         (new WebDriverWait(driver, 20)).until(new ExpectedCondition<Boolean>() {
             public Boolean apply(WebDriver d){
-                String result = d.findElement(PLANNING_DURATION_LOCATOR).getText();
+                String result = d.findElement(By.xpath("//span[@id='plannedDuration']")).getText();
                 return (!result.toLowerCase().equals("0"));
             }
         });
-        String executeString = driver.findElement(SAVE_LOCATOR).getAttribute("onclick");
+        String executeString = driver.findElement(saveButton).getAttribute("onclick");
         ((JavascriptExecutor)driver).executeScript(executeString);
         String btId = driver.findElement(By.xpath("//span[@class='item' and contains(text(), 'Business Trip ID: #')]/a")).getText();
         Assert.assertEquals(btId.length(), 19, "Business Trip is not created");
@@ -119,15 +102,12 @@ public class BaseTest {
     }
     @Test(dependsOnMethods = "createNewBt", description = "Log out")
     public void logOut() throws InterruptedException {
-        By LOGOUT_LOCATOR = By.xpath("//a[@href='logout.do']");
         String textWelcome = "Welcome to EPAM Cost Tracking Center";
-        waitForElementVisible(LOGOUT_LOCATOR);
-        waitForElementEnabled(LOGOUT_LOCATOR);
-        driver.findElement(LOGOUT_LOCATOR).click();
-        Alert alert = driver.switchTo().alert();
-        alert.accept();
-        String result = driver.findElement(By.xpath("//td[@class='header1']/h1"))
-                .getText();
+        waitForElementVisible(By.xpath("//a[@href='logout.do']"));
+        waitForElementEnabled(By.xpath("//a[@href='logout.do']"));
+        driver.findElement(By.xpath("//a[@href='logout.do']")).click();
+        driver.switchTo().alert().accept();
+        String result = driver.findElement(By.xpath("//td[@class='header1']/h1")).getText();
         Assert.assertEquals(result, textWelcome, "Logout is not performed");
     }
 
@@ -149,11 +129,11 @@ public class BaseTest {
         new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
     }
 
-    protected void waitForElementVisible(By locator) {
+    private void waitForElementVisible(By locator) {
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
     }
 
-    protected void waitForElementEnabled(By locator) {
+    private void waitForElementEnabled(By locator) {
         new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(locator));
     }
 
